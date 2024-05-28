@@ -5,9 +5,6 @@ const url = require('url');
 function createWindow() {
   const { width: workAreaWidth, height: workAreaHeight } = screen.getPrimaryDisplay().workAreaSize;
 
-  const spelledVariable = 1;
-  console.log(misspelledVariable);
-
   const win = new BrowserWindow({
     width: Math.min(1430, workAreaWidth),
     height: workAreaHeight,
