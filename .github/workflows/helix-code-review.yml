@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -18,17 +18,25 @@ jobs:
         with:
           python-version: '3.9'
   
-      - name: Install gpt-review and dependencies
-        run: |
-            pip install --upgrade pip
-            pip install -U langchain langchain-community llama_index
-            pip install gpt-review
+      - name: Install deps
+        run: |  
+            echo "installing gpt-review..."
+            sudo apt-get update
+            python3 -m venv .env
+            source .env/bin/activate
+            python -m pip install --upgrade pip
+            python -m pip install gpt-review
+  
+            echo "install done!"
+            gpt ask "hello"
 
       - name: Run gpt-review
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          source .env/bin/activate
+
           gpt github review \
             --access-token $GITHUB_ACCESS_TOKEN \
             --pull-request ${{ github.event.pull_request.number }} \
