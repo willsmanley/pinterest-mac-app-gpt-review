@@ -26,8 +26,8 @@ jobs:
       - name: Install gpt-review and dependencies
         run: |
             source venv/bin/activate
-            pip install -U langchain langchain-community
-            pip install gpt-review
+            pip install --upgrade pip
+            pip install -U langchain langchain-community llama_index
 
       - name: Run gpt-review
         env:
