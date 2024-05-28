@@ -18,8 +18,10 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install gpt-review
-        run: pip install gpt-review
+      - name: Install gpt-review and dependencies
+        run: |
+          pip install gpt-review
+          pip install langchain_community
 
       - name: Run gpt-review
         env:
