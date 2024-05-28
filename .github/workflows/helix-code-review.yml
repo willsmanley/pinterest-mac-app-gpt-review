@@ -18,10 +18,16 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Create and activate virtual environment
+        run: |
+            python -m venv venv
+            source venv/bin/activate 
+  
       - name: Install gpt-review and dependencies
         run: |
-          pip install -U langchain langchain_community
-          pip install gpt-review
+            source venv/bin/activate
+            pip install -U langchain langchain-community
+            pip install gpt-review
 
       - name: Run gpt-review
         env:
