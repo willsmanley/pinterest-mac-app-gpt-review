@@ -17,15 +17,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-
-      - name: Create and activate virtual environment
-        run: |
-            python -m venv venv
-            source venv/bin/activate 
   
       - name: Install gpt-review and dependencies
         run: |
-            source venv/bin/activate
             pip install --upgrade pip
             pip install -U langchain langchain-community llama_index
 
@@ -34,7 +28,7 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          venv/bin/gpt github review \
+          gpt github review \
             --access-token $GITHUB_ACCESS_TOKEN \
             --pull-request ${{ github.event.pull_request.number }} \
             --repository ${{ github.repository }}
