@@ -26,6 +26,9 @@ jobs:
             source .env/bin/activate
             python -m pip install --upgrade pip
             python -m pip install gpt-review
+            python -m pip install langchain
+            python -m pip install langchain_community
+            python -m pip install llama_index
   
             echo "install done!"
             gpt ask "hello"
