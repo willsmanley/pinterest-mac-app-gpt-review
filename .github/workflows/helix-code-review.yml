@@ -6,41 +6,56 @@ on:
       - master
 
 jobs:
-  helix-code-review:
+  add_pr_comment:
+    name: Helix Code Review
     runs-on: ubuntu-latest
 
+    env:
+      GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      REPOSITORY_NAME: ${{ github.repository }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      LINK: "https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+      FILE_SUMMARY: false
+      TEST_SUMMARY: false
+      BUG_SUMMARY: false
+      RISK_SUMMARY: false
+      RISK_BREAKING: false
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          python-version: '3.11'
-  
-      - name: Install deps
-        run: |  
-            echo "installing gpt-review..."
-            sudo apt-get update
-            python3 -m venv .env
-            source .env/bin/activate
-            python -m pip install --upgrade pip
-            python -m pip install gpt-review
-            python -m pip install langchain
-            python -m pip install langchain_community
-            python -m pip install llama_index
-  
-            echo "install done!"
-            gpt ask "hello"
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Run gpt-review
-        env:
-          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install gpt-review and dependencies
+        run: |
+          sudo apt-get update
+          python3 -m venv .env
+          source .env/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install gpt-review
+
+      - name: Run GPT review
         run: |
           source .env/bin/activate
-
           gpt github review \
-            --access-token $GITHUB_ACCESS_TOKEN \
-            --pull-request ${{ github.event.pull_request.number }} \
-            --repository ${{ github.repository }}
+            --access-token $GITHUB_TOKEN \
+            --pull-request $PR_NUMBER \
+            --repository $REPOSITORY_NAME
+        continue-on-error: true
+
+      # - name: Run additional review
+      #   run: |
+      #     source .env/bin/activate
+      #     gpt github review \
+      #       --access-token $GITHUB_TOKEN \
+      #       --pull-request $PR_NUMBER \
+      #       --repository $REPOSITORY_NAME
