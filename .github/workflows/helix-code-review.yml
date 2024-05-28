@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  gpt-review:
+  helix-code-review:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +20,8 @@ jobs:
 
       - name: Install gpt-review and dependencies
         run: |
+          pip install -U langchain langchain_community
           pip install gpt-review
-          pip install langchain_community
 
       - name: Run gpt-review
         env:
