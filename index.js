@@ -1,6 +1,7 @@
 const { app, BrowserWindow, screen, shell } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const url = require('url');
+const path = require('path');
 
 function createWindow() {
   const { width: workAreaWidth, height: workAreaHeight } = screen.getPrimaryDisplay().workAreaSize;
@@ -11,7 +12,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: true
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js') // Preload script to enable window resizing
     }
   });
 
@@ -31,7 +33,36 @@ function createWindow() {
       shell.openExternal(finalUrl);
     }
   });
+
+  // Add a button to resize the window
+  win.webContents.on('dom-ready', () => {
+    win.webContents.executeJavaScript(`
+      const resizeButton = document.createElement('button');
+      resizeButton.innerText = 'Resize Window';
+      resizeButton.style.position = 'fixed';
+      resizeButton.style.bottom = '10px';
+      resizeButton.style.right = '10px';
+      resizeButton.style.zIndex = 1000;
+      document.body.appendChild(resizeButton);
+      
+      resizeButton.addEventListener('click', () => {
+        window.resizeWindow(800, 600); // Resize to 800x600
+      });
+    `);
+  });
 }
+
+// Preload script (preload.js)
+const { contextBridge } = require('electron');
+
+contextBridge.exposeInMainWorld('window', {
+  resizeWindow: (width, height) => {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    if (currentWindow) {
+      currentWindow.setSize(width, height);
+    }
+  }
+});
 
 function extractFinalUrl(clickedUrl) {
   const parsedUrl = url.parse(clickedUrl, true);
